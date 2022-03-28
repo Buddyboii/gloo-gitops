@@ -1,0 +1,1 @@
+https://github.com/istio/istio/blob/master/samples/bookinfo/swagger.yaml

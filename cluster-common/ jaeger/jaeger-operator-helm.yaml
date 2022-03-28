@@ -1,0 +1,26 @@
+# https://www.jaegertracing.io/docs/1.22/operator/
+# helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+# helm search repo jaegertracing
+# TODO: Should Jaeger run on the Management cluster with Prometheus and Kiali?
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jaeger-operator-helm
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  project: default
+  source:
+    chart: jaeger-operator
+    repoURL: https://jaegertracing.github.io/helm-charts
+    targetRevision: 2.21.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

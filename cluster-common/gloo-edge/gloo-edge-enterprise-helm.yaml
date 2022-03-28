@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gloo-edge-enterprise-helm
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gloo-system
+  project: default
+  source:
+    chart: gloo-ee
+    helm:
+      values: |
+        # Expires: 2021-06-19T10:03:16-07:00
+        license_key: eyJleHAiOjE2MjQxMjIxOTYsImlhdCI6MTYyMTUzMDE5NiwiayI6IkRTcFNJZyIsImx0IjoiZW50IiwicHJvZHVjdCI6Imdsb28ifQ.rPrSfnhvwqn-hEzdm6DL8JSRC9csX2Mfhf3LGlJprwk
+        grafana:
+          defaultInstallationEnabled: false
+        prometheus:
+          enabled: false
+        global:
+          istioSDS:
+            enabled: true
+          istioIntegration:
+            labelInstallNamespace: false
+            whitelistDiscovery: true
+        gloo:
+          gatewayProxies:
+            gatewayProxy:
+              service:
+                extraAnnotations:
+                  service.beta.kubernetes.io/aws-load-balancer-type: nlb
+              tracing:
+                provider:
+                  zipkinConfig:
+                    cluster_name: zipkin
+                    collector_endpoint: /api/v2/spans
+                cluster:
+                  - name: zipkin
+                    connect_timeout: 1s
+                    type: STRICT_DNS
+                    respect_dns_ttl: true
+                    lb_policy: ROUND_ROBIN
+                    load_assignment:
+                      cluster_name: zipkin
+                      endpoints:
+                        - lb_endpoints:
+                          - endpoint:
+                              address:
+                                socket_address:
+                                  address: zipkin.istio-system
+                                  port_value: 9411
+    repoURL: http://storage.googleapis.com/gloo-ee-helm
+    targetRevision: 1.7.7
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

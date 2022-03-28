@@ -1,0 +1,1 @@
+Prometheus runs on the Management Cluster for Gloo Edge Enterprise; retain for future reference

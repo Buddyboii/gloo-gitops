@@ -1,0 +1,33 @@
+grafana:
+  defaultInstallationEnabled: true
+prometheus:
+  enabled: true
+global:
+  istioSDS:
+    enabled: true
+  istioIntegration:
+    labelInstallNamespace: false
+    whitelistDiscovery: true
+gloo:
+  gatewayProxies:
+    gatewayProxy:
+      tracing:
+        provider:
+          zipkinConfig:
+            cluster_name: zipkin
+            collector_endpoint: /api/v2/spans
+        cluster:
+          - name: zipkin
+            connect_timeout: 1s
+            type: STRICT_DNS
+            respect_dns_ttl: true
+            lb_policy: ROUND_ROBIN
+            load_assignment:
+              cluster_name: zipkin
+              endpoints:
+                - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: zipkin.istio-system
+                          port_value: 9411
