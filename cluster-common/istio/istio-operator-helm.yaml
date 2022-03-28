@@ -19,7 +19,7 @@ spec:
         - name: "hub"
           value: "gcr.io/istio-testing"
         - name: "tag"
-          value: "1.12.5"
+          value: "1.12-dev"
         - name: "operatorNamespace"
           value: "istio-operator"
         - name: "istioNamespace"
